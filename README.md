@@ -4,7 +4,7 @@
 - Next.js, FastAPI, MySQL을 사용했습니다.
 
 ## 🚀 구현 화면 
-- Local 
+### Local 
 ![구현 화면](assets/local.png)
-- Docker
+### Docker
 ![구현 화면](assets/docker.png)
