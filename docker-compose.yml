@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  nextjs:
+    build:
+      context: ./Final-front/my-app
+      dockerfile: ./Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - fastapi
+      - db
+    environment:
+      - NEXT_PUBLIC_API_URL=http://fastapi:5000 # FastAPI의 내부 URL을 환경 변수로 설정
+
+  fastapi:
+    build:
+      context: ./Final-back
+      dockerfile: ./Dockerfile
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=mysql+mysqlconnector://root:1234@db:3306/hello
+    networks:
+      - backend
+
+  db:
+    image: mysql:8.0
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: hello
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  db_data:
