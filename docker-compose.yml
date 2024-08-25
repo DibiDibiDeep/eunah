@@ -11,7 +11,9 @@ services:
       - fastapi
       - db
     environment:
-      - NEXT_PUBLIC_API_URL=http://fastapi:5000 # FastAPI의 내부 URL을 환경 변수로 설정
+      - NEXT_PUBLIC_API_URL=http://fastapi:5000
+    networks:
+      - backend  # fastapi와 동일한 네트워크 사용
 
   fastapi:
     build:
@@ -24,7 +26,12 @@ services:
     environment:
       - DATABASE_URL=mysql+mysqlconnector://root:1234@db:3306/hello
     networks:
-      - backend
+      - backend  # nextjs와 동일한 네트워크 사용
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://db:3306"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   db:
     image: mysql:8.0
@@ -35,8 +42,9 @@ services:
       MYSQL_DATABASE: hello
     volumes:
       - db_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql  # init.sql을 컨테이너에 복사
     networks:
-      - backend
+      - backend  # 다른 서비스들과 동일한 네트워크 사용
 
 networks:
   backend:
